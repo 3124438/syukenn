@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silent Choice - 声なき選択</title>
+    <style>
+        /* フェーズ2でちゃんとしたデザインにします。今は仮のスタイルです */
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            background-color: #222;
+            color: #eee;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            background: #333;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        h1 { margin-bottom: 25px; font-size: 28px; border-bottom: 2px solid #555; padding-bottom: 10px; }
+        h3 { color: #81c995; margin-top: 0; }
+        p { font-size: 18px; line-height: 1.8; margin-bottom: 30px; text-align: left; }
+        .btn-group { display: flex; flex-direction: column; gap: 15px; }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 18px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+        button:hover { background-color: #45a049; transform: translateY(-2px); }
+        button.secondary { background-color: #555; }
+        button.search-btn { background-color: #2196F3; }
+        
+        /* 選択肢の強調 */
+        .policy-box {
+            background: #444;
+            border: 1px solid #666;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .policy-title { font-weight: bold; color: #ffeb3b; font-size: 1.1em; }
+        
+        /* 結果画面のメリット・デメリット */
+        .result-box { text-align: left; background: #2a2a2a; padding: 20px; border-radius: 8px; }
+        .good { color: #81c995; }
+        .bad { color: #f28b82; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="game-container">
+    </div>
+
+<script>
+    // --- シナリオデータ ---
+    const scenes = {
+        // --- イントロ ---
+        intro: {
+            title: "Silent Choice",
+            text: "ようこそ。<br>ここはあなたの「選択」の重さを測るシミュレーターです。<br><br>これからの数分間、あなたは日常の小さな場面から国家の命運まで、様々な選択を迫られます。<br>準備はいいですか？",
+            buttons: [
+                { text: "体験を始める", next: "stage1" }
+            ]
+        },
+
+        // --- Stage 1: 家族旅行 ---
+        stage1: {
+            title: "Stage 1：意見表明",
+            text: "あなたは4人家族のお父さんです。<br>今、家族会議で「次の旅行先」を決めています。<br><br>母：「絶対買い物に行きたいわ！」<br>祖父：「わしは温泉がいいのぉ」<br>娘：「遊園地じゃなきゃヤダ！」<br><br>あなたは心の中で<b>「キャンプに行きたい」</b>と思っています。<br>しかし、母の声が大きく、このままだと「買い物」に決まりそうです。",
+            buttons: [
+                { text: "黙って見ている", next: "stage1_fail" },
+                { text: "カードを出す（意見を言う）", next: "stage1_success" }
+            ]
+        },
+        stage1_fail: {
+            title: "結果：沈黙",
+            text: "あなたは黙っていました。<br>結局、お母さんの意見が通り「買い物」に決まりました。<br><br>あなたの「キャンプに行きたい」という願いは、誰にも知られることなく消えました。<br><b>教訓：沈黙は、現状への肯定（YES）と同じです。</b>",
+            buttons: [{ text: "次のステージへ", next: "stage2" }]
+        },
+        stage1_success: {
+            title: "結果：変化",
+            text: "「実はキャンプに行きたいんだ」と勇気を出して言いました。<br>家族は驚きましたが、「パパが言うなら…たまにはいいかもね」と議論のテーブルに乗りました。<br><br><b>教訓：意見は発信しない限り、選択肢にすらなりません。</b>",
+            buttons: [{ text: "次のステージへ", next: "stage2" }]
+        },
+
+        // --- Stage 2: 謎の晩ごはん ---
+        stage2: {
+            title: "Stage 2：情報収集",
+            text: "今日の夕食を決めるため、母からLINEで候補が送られてきました。<br>写真はありません。<br><br><b>A：ヤンソンさんの誘惑</b>（響きがカッコイイ！）<br><b>B：ピッティパンナ</b>（響きがカワイイ！）<br><br>どっちにする？",
+            buttons: [
+                { text: "A（ヤンソンさんの誘惑）にする", next: "stage2_bad_a" },
+                { text: "B（ピッティパンナ）にする", next: "stage2_bad_b" },
+                { text: "スマホで検索する", next: "stage2_search", class: "search-btn" }
+            ]
+        },
+        stage2_bad_a: {
+            title: "結果：イメージとのギャップ",
+            text: "カッコイイ名前に惹かれてAを選びました。<br>出てきたのは<b>「アンチョビ（塩辛い小魚）たっぷりのグラタン」</b>でした。<br>あなたは魚の生臭さが苦手だったので、少し後悔しました。<br><br><b>教訓：中身を知らずに選ぶのは、ギャンブルと同じです。</b>",
+            buttons: [{ text: "次のステージへ", next: "stage3" }]
+        },
+        stage2_bad_b: {
+            title: "結果：イメージとのギャップ",
+            text: "可愛い名前に惹かれてBを選びました。<br>スイーツかと思いきや、出てきたのは<b>「ジャガイモと肉の炒め物」</b>でした。<br>美味しいですが、甘いものが食べたかったのでガッカリしました。<br><br><b>教訓：耳障りの良い言葉には、裏があるかもしれません。</b>",
+            buttons: [{ text: "次のステージへ", next: "stage3" }]
+        },
+        stage2_search: {
+            title: "検索結果",
+            text: "スマホで調べました。<br><br><b>A：ヤンソンさんの誘惑</b><br>→ スウェーデンの伝統料理。アンチョビとポテトのグラタン。<br><br><b>B：ピッティパンナ</b><br>→ スウェーデンの家庭料理。残り物のポテト炒め。<br><br>中身がわかりました。どちらにしますか？",
+            buttons: [
+                { text: "アンチョビは苦手だからBにする", next: "stage2_good" },
+                { text: "グラタンが好きだからAにする", next: "stage2_good" }
+            ]
+        },
+        stage2_good: {
+            title: "結果：納得の選択",
+            text: "自分の好みに合った料理を選べました！<br>知っていたおかげで、失敗せずに済みました。<br><br><b>教訓：情報は武器です。知ることで、初めて自分のための選択ができます。</b>",
+            buttons: [{ text: "次のステージへ", next: "stage3" }]
+        },
+
+        // --- Stage 3: 学校のトイレ ---
+        stage3: {
+            title: "Stage 3：行動と変革",
+            text: "あなたの学校のトイレは、廊下から中が丸見えです。<br>みんな「恥ずかしい」「嫌だ」と思っています。<br>あなたはどうしますか？",
+            buttons: [
+                { text: "友達に文句を言う", next: "stage3_fail" },
+                { text: "我慢して使う", next: "stage3_fail" },
+                { text: "生徒会に意見書を出す", next: "stage3_success" }
+            ]
+        },
+        stage3_fail: {
+            title: "結果：現状維持",
+            text: "文句を言ったり我慢したりしましたが、<br>結局、卒業するまでトイレは丸見えのままでした。<br>何も変わりませんでした。<br><br><b>教訓：不満を口にするだけでは、世界は1ミリも変わりません。</b>",
+            buttons: [{ text: "メッセージへ", next: "review" }]
+        },
+        stage3_success: {
+            title: "結果：変革",
+            text: "あなたは勇気を出して意見書を出しました。<br>それを見た先生たちが動き、翌月には目隠しのパーティションが設置されました！<br><br><b>教訓：ルールを変えるのは、具体的な「行動」だけです。</b>",
+            buttons: [{ text: "メッセージへ", next: "review" }]
+        },
+
+        // --- Bridge: メッセージ ---
+        review: {
+            title: "私たちのメッセージ",
+            text: `
+                <div style="text-align:left; background:#222; padding:15px; border-left:4px solid #fff;">
+                政治とは、遠いニュースの話ではありません。<br>
+                今日の晩ごはんや、学校のトイレを決めるプロセスのことです。<br><br>
+                声を上げなければ、無視される。<br>
+                知ろうとしなければ、誘導される。<br>
+                行動しなければ、変わらない。<br><br>
+                さあ、準備はいいですか？<br>
+                <b>あなたは今から、ある国の未来を決めます。</b>
+                </div>`,
+            buttons: [
+                { text: "投票会場へ進む", next: "final_vote" }
+            ]
+        },
+
+        // --- Final Stage: 10兆円の使い道 ---
+        final_vote: {
+            title: "Final Stage：歴史の選択",
+            text: "あなたは架空の国「アトラス共和国」の国民です。<br>今年、国の予算が<b>「10兆円」</b>余りました。<br>3人の候補者が使い道を提案しています。誰にこの国の未来を託しますか？",
+            buttons: [
+                { 
+                    html: "<div class='policy-box'><div class='policy-title'>候補者A：今を豊かに</div>国民全員に100万円を配ります！今の生活を楽にしましょう。</div>",
+                    next: "result_a" 
+                },
+                { 
+                    html: "<div class='policy-box'><div class='policy-title'>候補者B：未来へ投資</div>大学までの学費を無料にします！効果が出るのは10年後です。</div>",
+                    next: "result_b" 
+                },
+                { 
+                    html: "<div class='policy-box'><div class='policy-title'>候補者C：鉄壁の守り</div>軍事と防災を強化します！災害や戦争から命を守ります。</div>",
+                    next: "result_c" 
+                }
+            ]
+        },
+
+        // --- 結果発表 A ---
+        result_a: {
+            title: "あなたが選んだ未来：A（現金給付）",
+            text: `
+                <div class="result-box">
+                    <h3>結果：国中がお祭り騒ぎになりました！</h3>
+                    <p><span class="good">【光】メリット</span><br>みんな欲しかった物が買えて、一時的に笑顔が溢れました。お店も繁盛しました。</p>
+                    <p><span class="bad">【影】デメリット</span><br>しかし翌年、お金は使い果たされ生活は元通りに。何も施設が残らなかったため、国は衰退しました。</p>
+                    <hr>
+                    <p><b>学び：あなたは「現在」を選び、「未来」を食いつぶしました。</b></p>
+                </div>`,
+            buttons: [{ text: "みんなの投票結果を見る", next: "chart_view" }]
+        },
+        // --- 結果発表 B ---
+        result_b: {
+            title: "あなたが選んだ未来：B（未来投資）",
+            text: `
+                <div class="result-box">
+                    <h3>結果：若者が天才的な発明をしました！</h3>
+                    <p><span class="good">【光】メリット</span><br>10年後、あなたの国から新しい産業が生まれ、世界一豊かな国になりました。</p>
+                    <p><span class="bad">【影】デメリット</span><br>しかし、その10年間に貧困で倒れた人々は見捨てられました。「明日のご飯がないのに未来の話をするな」と暴動が起きました。</p>
+                    <hr>
+                    <p><b>学び：あなたは「未来」のために、「現在」の弱者を切り捨てました。</b></p>
+                </div>`,
+            buttons: [{ text: "みんなの投票結果を見る", next: "chart_view" }]
+        },
+        // --- 結果発表 C ---
+        result_c: {
+            title: "あなたが選んだ未来：C（安全強化）",
+            text: `
+                <div class="result-box">
+                    <h3>結果：犯罪も被害もゼロの国になりました！</h3>
+                    <p><span class="good">【光】メリット</span><br>大災害が起きても、一人の死者も出ませんでした。治安も良く、夜道も安心です。</p>
+                    <p><span class="bad">【影】デメリット</span><br>しかし、街中は監視カメラだらけ。「自由」な発言は許されない、息苦しい管理社会になりました。</p>
+                    <hr>
+                    <p><b>学び：あなたは「安全」のために、「自由」を差し出しました。</b></p>
+                </div>`,
+            buttons: [{ text: "みんなの投票結果を見る", next: "chart_view" }]
+        },
+
+        // --- 最終チャート（仮） ---
+        chart_view: {
+            title: "投票結果",
+            text: "本日の来場者の投票結果です。<br>（※現在は開発中のため、仮のデータを表示しています）<br><br><b>A（今）：30%<br>B（未来）：45%<br>C（安全）：25%</b><br><br>正解はありません。<br>しかし、選ばなければ勝手に決まってしまいます。<br>あなたの現実（リアル）の一票を、大切に。",
+            buttons: [
+                { text: "タイトルに戻る", next: "intro" }
+            ]
+        }
+    };
+
+    // --- ゲームエンジン部分 ---
+    function showScene(sceneKey) {
+        const container = document.getElementById('game-container');
+        const scene = scenes[sceneKey];
+        
+        // HTML生成
+        let html = `<h1>${scene.title}</h1>`;
+        html += `<p>${scene.text}</p>`;
+        html += `<div class="btn-group">`;
+        
+        scene.buttons.forEach(btn => {
+            // ボタンの表示内容（単なるテキストか、HTMLか）
+            const label = btn.html ? btn.html : btn.text;
+            // クラス指定があれば追加
+            const className = btn.class ? btn.class : '';
+            
+            html += `<button class="${className}" onclick="showScene('${btn.next}')">${label}</button>`;
+        });
+        
+        html += `</div>`;
+        container.innerHTML = html;
+        
+        // ページトップへスクロール
+        window.scrollTo(0, 0);
+    }
+
+    // 初期化：イントロを表示
+    showScene('intro');
+
+</script>
+
+</body>
+</html>

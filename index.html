@@ -4,66 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Silent Choice - 声なき選択</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #121212;
-            --card-color: #1e1e1e;
-            --text-main: #e0e0e0;
-            --accent-color: #4CAF50;
-            --danger-color: #e53935;
-            --info-color: #2196F3;
+            --primary: #00ffaa; /* ネオンあじさい色 */
+            --glass-bg: rgba(0, 0, 0, 0.75); /* 濃いめのガラス */
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-color: #ffffff;
         }
 
         body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            text-align: center;
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden; /* スクロール禁止 */
+            background-color: #111;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            background-image: radial-gradient(circle at center, #2a2a2a 0%, #121212 100%);
         }
 
-        .container {
+        /* 背景画像のレイヤー */
+        #bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920&auto=format&fit=crop'); /* 初期画像 */
+            transition: opacity 0.5s ease-in-out;
+            z-index: -1;
+            filter: brightness(0.4) blur(2px); /* 暗くして少しぼかす */
+        }
+
+        /* メインのカード（グラスモーフィズム） */
+        .container {
+            width: 90%;
             max-width: 600px;
-            background: var(--card-color);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px); /* すりガラス効果 */
+            -webkit-backdrop-filter: blur(10px);
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            /* フェードインアニメーション */
-            animation: fadeIn 0.8s ease-out;
-            border: 1px solid #333;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            text-align: center;
+            color: var(--text-color);
+            animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* アニメーション定義 */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
-            margin-bottom: 30px;
-            font-size: 24px;
-            letter-spacing: 2px;
-            border-bottom: 1px solid #444;
-            padding-bottom: 15px;
-            color: #fff;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+            display: inline-block;
         }
 
         p {
-            font-size: 16px;
+            font-size: 1.1rem;
             line-height: 1.8;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             text-align: left;
-            color: #ccc;
         }
 
+        /* ボタンのデザイン */
         .btn-group {
             display: flex;
             flex-direction: column;
@@ -71,172 +86,178 @@
         }
 
         button {
-            background-color: var(--card-color);
-            color: #fff;
-            border: 1px solid #555;
-            padding: 20px;
-            font-size: 16px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid var(--glass-border);
+            padding: 18px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 500;
             text-align: left;
             position: relative;
             overflow: hidden;
-            font-family: 'Noto Sans JP', sans-serif;
+            font-family: inherit;
         }
 
         button:hover {
-            background-color: #333;
-            transform: translateY(-3px);
-            border-color: var(--accent-color);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+            background: rgba(0, 255, 170, 0.2);
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(0, 255, 170, 0.3);
         }
 
         button::after {
-            content: '>';
+            content: '➔';
             position: absolute;
             right: 20px;
-            opacity: 0.5;
+            opacity: 0.7;
         }
 
-        /* 特定のボタンスタイル */
+        /* 検索ボタンなど特殊なボタン */
         button.search-btn {
-            border-color: var(--info-color);
-            color: var(--info-color);
+            border-color: #4facfe;
+            background: rgba(79, 172, 254, 0.1);
         }
         button.search-btn:hover {
-            background-color: rgba(33, 150, 243, 0.1);
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.2);
+            background: rgba(79, 172, 254, 0.3);
+            border-color: #4facfe;
+            box-shadow: 0 0 15px rgba(79, 172, 254, 0.3);
         }
 
-        /* 政策ボックスのスタイル */
-        .policy-box {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .policy-title {
-            font-weight: bold;
-            color: #ffd700;
-            font-size: 1.1em;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        /* 結果表示のスタイル */
+        /* 結果表示の枠 */
         .result-box {
-            text-align: left;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 25px;
-            border-radius: 12px;
-            border-left: 4px solid var(--accent-color);
-        }
-        .good { color: #81c995; font-weight: bold; }
-        .bad { color: #f28b82; font-weight: bold; }
-        
-        /* グラフエリア（今は仮） */
-        .chart-placeholder {
-            height: 200px;
-            background: #222;
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
+            border-left: 4px solid var(--primary);
             margin-bottom: 20px;
+            text-align: left;
         }
+        .good { color: #69f0ae; font-weight: bold; }
+        .bad { color: #ff5252; font-weight: bold; }
 
+        /* スマホ対応 */
+        @media (max-width: 600px) {
+            .container { padding: 25px; width: 85%; }
+            h1 { font-size: 1.5rem; }
+            p { font-size: 0.95rem; }
+        }
     </style>
 </head>
 <body>
+
+<div id="bg-layer"></div>
 
 <div class="container" id="game-container">
     </div>
 
 <script>
+    // --- 画像の設定（Unsplashの画像URL） ---
+    // キーワードで画像を検索して表示するURL形式を使っています
+    const bgImages = {
+        intro: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80", // 宇宙・ネットワーク
+        stage1: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80", // 家族・リビング
+        stage2: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&q=80", // レストラン・料理
+        stage3: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&q=80", // 学校・教室（トイレは暗いので教室で代用）
+        review: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80", // オフィス・会議室
+        final_vote: "https://images.unsplash.com/photo-1541872703-74c5963631df?auto=format&fit=crop&q=80", // 議会・投票
+        result: "https://images.unsplash.com/photo-1461301214746-1e790926d323?auto=format&fit=crop&q=80" // 結果・未来
+    };
+
     // --- シナリオデータ ---
     const scenes = {
         intro: {
             title: "Silent Choice",
-            text: "ようこそ。<br>ここはあなたの「選択」の重さを測るシミュレーターです。<br><br>これからの数分間、あなたは日常の小さな場面から国家の命運まで、様々な選択を迫られます。<br>準備はいいですか？",
-            buttons: [
-                { text: "体験を始める", next: "stage1" }
-            ]
+            text: "ようこそ。<br>これはあなたの「選択」が未来をどう変えるか、その重さを測るシミュレーターです。<br><br>日常の些細な一言から、国家の命運まで。<br>あなたの指先一つで世界線が分岐します。<br><br>準備はいいですか？",
+            buttons: [{ text: "Start Simulation", next: "stage1" }],
+            bg: "intro"
         },
         stage1: {
-            title: "Stage 1：意見表明",
-            text: "あなたは4人家族のお父さんです。<br>今、家族会議で「次の旅行先」を決めています。<br><br>母：「絶対買い物に行きたいわ！」<br>祖父：「わしは温泉がいいのぉ」<br>娘：「遊園地じゃなきゃヤダ！」<br><br>あなたは心の中で<b>「キャンプに行きたい」</b>と思っています。<br>しかし、母の声が大きく、このままだと「買い物」に決まりそうです。",
+            title: "Stage 1：沈黙の食卓",
+            text: "【状況】家族会議で「次の旅行先」を決めています。<br><br>母：「買い物に行きたいわ！」<br>祖父：「温泉がいいのぉ」<br>娘：「遊園地じゃなきゃヤダ！」<br><br>あなたは<b>「キャンプ」</b>に行きたいと思っています。<br>しかし、母の声が大きく、このままだと「買い物」に決まりそうです。",
             buttons: [
                 { text: "黙って見ている", next: "stage1_fail" },
                 { text: "カードを出す（意見を言う）", next: "stage1_success" }
-            ]
+            ],
+            bg: "stage1"
         },
         stage1_fail: {
-            title: "結果：沈黙",
-            text: "あなたは黙っていました。<br>結局、お母さんの意見が通り「買い物」に決まりました。<br><br>あなたの「キャンプに行きたい」という願いは、誰にも知られることなく消えました。<br><b>教訓：沈黙は、現状への肯定（YES）と同じです。</b>",
-            buttons: [{ text: "次のステージへ", next: "stage2" }]
+            title: "Result：沈黙の代償",
+            text: "あなたは黙っていました。<br>結局、お母さんの意見が通り「買い物」に決定。<br><br>あなたの「キャンプ」という願いは、誰にも知られることなく消滅しました。<br><br><b>教訓：沈黙は、現状への肯定（YES）と同じです。</b>",
+            buttons: [{ text: "Next Stage", next: "stage2" }],
+            bg: "stage1"
         },
         stage1_success: {
-            title: "結果：変化",
-            text: "「実はキャンプに行きたいんだ」と勇気を出して言いました。<br>家族は驚きましたが、「パパが言うなら…たまにはいいかもね」と議論のテーブルに乗りました。<br><br><b>教訓：意見は発信しない限り、選択肢にすらなりません。</b>",
-            buttons: [{ text: "次のステージへ", next: "stage2" }]
+            title: "Result：変化の兆し",
+            text: "「実はキャンプに行きたいんだ」<br>勇気を出して言いました。家族は驚きましたが、「パパが言うなら…たまにはいいかも」と議論のテーブルに乗りました！<br><br><b>教訓：意見は発信しない限り、選択肢にすらなりません。</b>",
+            buttons: [{ text: "Next Stage", next: "stage2" }],
+            bg: "stage1"
         },
         stage2: {
-            title: "Stage 2：情報収集",
-            text: "今日の夕食を決めるため、母からLINEで候補が送られてきました。<br>写真はありません。<br><br><b>A：ヤンソンさんの誘惑</b>（響きがカッコイイ！）<br><b>B：ピッティパンナ</b>（響きがカワイイ！）<br><br>どっちにする？",
+            title: "Stage 2：情報の迷宮",
+            text: "【状況】今日の夕食、母からLINEで候補が送られてきました。<br>写真はありません。<br><br><b>A：ヤンソンさんの誘惑</b>（響きがカッコイイ！）<br><b>B：ピッティパンナ</b>（響きがカワイイ！）<br><br>直感で選んでください。",
             buttons: [
                 { text: "A（ヤンソンさんの誘惑）にする", next: "stage2_bad_a" },
                 { text: "B（ピッティパンナ）にする", next: "stage2_bad_b" },
                 { text: "スマホで検索する", next: "stage2_search", class: "search-btn" }
-            ]
+            ],
+            bg: "stage2"
         },
         stage2_bad_a: {
-            title: "結果：イメージとのギャップ",
-            text: "カッコイイ名前に惹かれてAを選びました。<br>出てきたのは<b>「アンチョビ（塩辛い小魚）たっぷりのグラタン」</b>でした。<br>あなたは魚の生臭さが苦手だったので、少し後悔しました。<br><br><b>教訓：中身を知らずに選ぶのは、ギャンブルと同じです。</b>",
-            buttons: [{ text: "次のステージへ", next: "stage3" }]
+            title: "Result：イメージとの乖離",
+            text: "カッコイイ名前に惹かれてAを選択。<br>出てきたのは<b>「アンチョビ（塩漬け小魚）たっぷりのグラタン」</b>でした。<br>あなたは魚の生臭さが苦手だったので、後悔しました。<br><br><b>教訓：中身を知らずに選ぶのは、ギャンブルと同じです。</b>",
+            buttons: [{ text: "Next Stage", next: "stage3" }],
+            bg: "stage2"
         },
         stage2_bad_b: {
-            title: "結果：イメージとのギャップ",
-            text: "可愛い名前に惹かれてBを選びました。<br>スイーツかと思いきや、出てきたのは<b>「ジャガイモと肉の炒め物」</b>でした。<br>美味しいですが、甘いものが食べたかったのでガッカリしました。<br><br><b>教訓：耳障りの良い言葉には、裏があるかもしれません。</b>",
-            buttons: [{ text: "次のステージへ", next: "stage3" }]
+            title: "Result：イメージとの乖離",
+            text: "可愛い名前に惹かれてBを選択。<br>スイーツかと思いきや、出てきたのは<b>「ジャガイモと肉の炒め物」</b>でした。<br>美味しいですが、口が甘いものモードだったのでガッカリ。<br><br><b>教訓：耳障りの良い言葉には、裏があるかもしれません。</b>",
+            buttons: [{ text: "Next Stage", next: "stage3" }],
+            bg: "stage2"
         },
         stage2_search: {
-            title: "検索結果",
-            text: "スマホで調べました。<br><br><b>A：ヤンソンさんの誘惑</b><br>→ スウェーデンの伝統料理。アンチョビとポテトのグラタン。<br><br><b>B：ピッティパンナ</b><br>→ スウェーデンの家庭料理。残り物のポテト炒め。<br><br>中身がわかりました。どちらにしますか？",
+            title: "Search Result",
+            text: "スマホで検索しました。<br><br><b>A：ヤンソンさんの誘惑</b><br>→ アンチョビとポテトのグラタン。<br><b>B：ピッティパンナ</b><br>→ 残り物のポテトと肉の炒め物。<br><br>中身がわかりました。どちらにしますか？",
             buttons: [
                 { text: "アンチョビは苦手だからBにする", next: "stage2_good" },
                 { text: "グラタンが好きだからAにする", next: "stage2_good" }
-            ]
+            ],
+            bg: "stage2"
         },
         stage2_good: {
-            title: "結果：納得の選択",
-            text: "自分の好みに合った料理を選べました！<br>知っていたおかげで、失敗せずに済みました。<br><br><b>教訓：情報は武器です。知ることで、初めて自分のための選択ができます。</b>",
-            buttons: [{ text: "次のステージへ", next: "stage3" }]
+            title: "Result：納得の選択",
+            text: "自分の好みに合った料理を選べました！<br>知っていたおかげで、失敗せずに済みました。<br><br><b>教訓：情報は武器です。知ることで、初めて「自分のための選択」ができます。</b>",
+            buttons: [{ text: "Next Stage", next: "stage3" }],
+            bg: "stage2"
         },
         stage3: {
             title: "Stage 3：行動と変革",
-            text: "あなたの学校のトイレは、廊下から中が丸見えです。<br>みんな「恥ずかしい」「嫌だ」と思っています。<br>あなたはどうしますか？",
+            text: "【状況】学校のトイレは廊下から丸見えで、みんな困っています。<br>あなたはどうしますか？",
             buttons: [
                 { text: "友達に文句を言う", next: "stage3_fail" },
                 { text: "我慢して使う", next: "stage3_fail" },
                 { text: "生徒会に意見書を出す", next: "stage3_success" }
-            ]
+            ],
+            bg: "stage3"
         },
         stage3_fail: {
-            title: "結果：現状維持",
-            text: "文句を言ったり我慢したりしましたが、<br>結局、卒業するまでトイレは丸見えのままでした。<br>何も変わりませんでした。<br><br><b>教訓：不満を口にするだけでは、世界は1ミリも変わりません。</b>",
-            buttons: [{ text: "メッセージへ", next: "review" }]
+            title: "Result：現状維持",
+            text: "文句を言ったり我慢したりしましたが、<br>卒業するまでトイレは丸見えのままでした。<br>何も変わりませんでした。<br><br><b>教訓：不満を口にするだけでは、世界は1ミリも変わりません。</b>",
+            buttons: [{ text: "メッセージへ", next: "review" }],
+            bg: "stage3"
         },
         stage3_success: {
-            title: "結果：変革",
-            text: "あなたは勇気を出して意見書を出しました。<br>それを見た先生たちが動き、翌月には目隠しのパーティションが設置されました！<br><br><b>教訓：ルールを変えるのは、具体的な「行動」だけです。</b>",
-            buttons: [{ text: "メッセージへ", next: "review" }]
+            title: "Result：世界を変える一歩",
+            text: "あなたは勇気を出して意見書を出しました。<br>それを見た先生たちが動き、翌月には目隠しが設置されました！<br><br><b>教訓：ルールを変えるのは、具体的な「行動」だけです。</b>",
+            buttons: [{ text: "メッセージへ", next: "review" }],
+            bg: "stage3"
         },
         review: {
-            title: "私たちのメッセージ",
+            title: "Our Message",
             text: `
-                <div style="text-align:left; padding:10px;">
+                <div style="text-align:left; background:rgba(0,0,0,0.3); padding:15px; border-radius:8px;">
                 政治とは、遠いニュースの話ではありません。<br>
                 今日の晩ごはんや、学校のトイレを決めるプロセスのことです。<br><br>
                 声を上げなければ、無視される。<br>
@@ -247,28 +268,21 @@
                 </div>`,
             buttons: [
                 { text: "投票会場へ進む", next: "final_vote" }
-            ]
+            ],
+            bg: "review"
         },
         final_vote: {
-            title: "Final Stage：歴史の選択",
+            title: "Final：歴史の選択",
             text: "あなたは架空の国「アトラス共和国」の国民です。<br>今年、国の予算が<b>「10兆円」</b>余りました。<br>3人の候補者が使い道を提案しています。誰にこの国の未来を託しますか？",
             buttons: [
-                { 
-                    html: "<span class='policy-title'>候補者A：今を豊かに</span>国民全員に100万円給付！今の生活を楽に。",
-                    next: "result_a" 
-                },
-                { 
-                    html: "<span class='policy-title'>候補者B：未来へ投資</span>学費完全無料！10年後の最強国家へ。",
-                    next: "result_b" 
-                },
-                { 
-                    html: "<span class='policy-title'>候補者C：鉄壁の守り</span>軍事と防災を強化。命を最優先に守る。",
-                    next: "result_c" 
-                }
-            ]
+                { html: "<span style='color:#ffd700'>候補者A：今を豊かに</span><br><small>国民全員に100万円給付！今の生活を楽に。</small>", next: "result_a" },
+                { html: "<span style='color:#69f0ae'>候補者B：未来へ投資</span><br><small>学費完全無料！10年後の最強国家へ。</small>", next: "result_b" },
+                { html: "<span style='color:#4facfe'>候補者C：鉄壁の守り</span><br><small>軍事と防災を強化。命を最優先に守る。</small>", next: "result_c" }
+            ],
+            bg: "final_vote"
         },
         result_a: {
-            title: "あなたが選んだ未来：A",
+            title: "選んだ未来：A（現在重視）",
             text: `
                 <div class="result-box">
                     <h3>結果：国中がお祭り騒ぎに！</h3>
@@ -277,10 +291,11 @@
                     <hr>
                     <p><b>学び：あなたは「現在」を選び、「未来」を食いつぶしました。</b></p>
                 </div>`,
-            buttons: [{ text: "みんなの投票結果を見る", next: "chart_view" }]
+            buttons: [{ text: "みんなの投票結果を見る", next: "chart_view" }],
+            bg: "result"
         },
         result_b: {
-            title: "あなたが選んだ未来：B",
+            title: "選んだ未来：B（未来重視）",
             text: `
                 <div class="result-box">
                     <h3>結果：若者が天才的な発明を！</h3>
@@ -289,10 +304,11 @@
                     <hr>
                     <p><b>学び：あなたは「未来」のために、「現在」の弱者を切り捨てました。</b></p>
                 </div>`,
-            buttons: [{ text: "みんなの投票結果を見る", next: "chart_view" }]
+            buttons: [{ text: "みんなの投票結果を見る", next: "chart_view" }],
+            bg: "result"
         },
         result_c: {
-            title: "あなたが選んだ未来：C",
+            title: "選んだ未来：C（安全重視）",
             text: `
                 <div class="result-box">
                     <h3>結果：犯罪も被害もゼロ！</h3>
@@ -301,46 +317,60 @@
                     <hr>
                     <p><b>学び：あなたは「安全」のために、「自由」を差し出しました。</b></p>
                 </div>`,
-            buttons: [{ text: "みんなの投票結果を見る", next: "chart_view" }]
+            buttons: [{ text: "みんなの投票結果を見る", next: "chart_view" }],
+            bg: "result"
         },
         chart_view: {
-            title: "投票結果",
-            text: "（ここにリアルタイムのグラフが表示されます）<br><br>正解はありません。しかし、選ばなければ勝手に決まってしまいます。<br>あなたの現実（リアル）の一票を、大切に。",
-            buttons: [
-                { text: "タイトルに戻る", next: "intro" }
-            ]
+            title: "Voting Result",
+            text: "現在、Firebase集計システムは準備中です。<br><br>正解はありません。しかし、選ばなければ勝手に決まってしまいます。<br>あなたの現実（リアル）の一票を、大切に。",
+            buttons: [{ text: "タイトルに戻る", next: "intro" }],
+            bg: "result"
         }
     };
 
     function showScene(sceneKey) {
         const container = document.getElementById('game-container');
+        const bgLayer = document.getElementById('bg-layer');
         const scene = scenes[sceneKey];
         
-        // アニメーションのリセット（フェードインを毎回させるため）
-        container.style.animation = 'none';
-        container.offsetHeight; /* trigger reflow */
-        container.style.animation = 'fadeIn 0.5s ease-out';
+        // 1. コンテナを一旦消す（アニメーション用）
+        container.style.display = 'none';
 
-        let html = `<h1>${scene.title}</h1>`;
-        html += `<p>${scene.text}</p>`;
-        
-        // グラフ画面の場合の特別処理（今はプレースホルダー）
-        if(sceneKey === 'chart_view') {
-            html += `<div class="chart-placeholder">Graph Area</div>`;
+        // 2. 背景画像の切り替え
+        // 背景が設定されている場合のみ切り替える
+        if (scene.bg && bgImages[scene.bg]) {
+            // 背景を暗くしてから切り替えるための処理（簡易的）
+            bgLayer.style.opacity = 0;
+            setTimeout(() => {
+                bgLayer.style.backgroundImage = `url('${bgImages[scene.bg]}')`;
+                bgLayer.style.opacity = 1;
+            }, 300);
         }
 
+        // 3. HTMLの生成
+        let html = `<h1>${scene.title}</h1>`;
+        html += `<p>${scene.text}</p>`;
         html += `<div class="btn-group">`;
+        
         scene.buttons.forEach(btn => {
             const label = btn.html ? btn.html : btn.text;
             const className = btn.class ? btn.class : '';
             html += `<button class="${className}" onclick="showScene('${btn.next}')">${label}</button>`;
         });
-        html += `</div>`;
         
+        html += `</div>`;
         container.innerHTML = html;
-        window.scrollTo(0, 0);
+
+        // 4. コンテナを再表示（アニメーション発動）
+        setTimeout(() => {
+            container.style.display = 'block';
+            container.style.animation = 'none';
+            container.offsetHeight; /* trigger reflow */
+            container.style.animation = 'slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        }, 100);
     }
 
+    // 初期化
     showScene('intro');
 </script>
 
